@@ -1,6 +1,7 @@
 DW 9/17/17
 
 Quick library for gpib communication using a PROLOGIX GPIB-USB connector
+Currently supported devices: DS345 Function Generator, DG535 SRS Pulse Generator 
 
 devices.py -- class file. Refer here for available daq commands. Should be easily expandable
 
