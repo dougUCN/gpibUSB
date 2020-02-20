@@ -3,6 +3,7 @@ import serial
 import time
 
 class ds345:    #SRS Signal generator
+    WAIT = 0.01 # Seconds to wait after sending command
 
     def __init__(self, devpath, address):
         self.devpath = devpath
@@ -10,34 +11,38 @@ class ds345:    #SRS Signal generator
         self.addr = str(address)
 
         self.qAddr()
-        self.port.write(b'*RST\n')    # Reset to default
-        self.port.write(b'FUNC 0\n')    # Sine wave
+        self.sendCmd('*RST\n')    # Reset to default
+        self.sendCmd('FUNC 0\n')    # Sine wave
 
-    def qAddr(self):        # Query address
-        self.port.write( bytes('++addr ' + self.addr + '\n', 'utf-8' ))
+    def sendCmd(self, cmd):
+        self.port.write( bytes(cmd, 'utf-8') )
+        time.sleep(self.WAIT)
+
+    def qAddr(self):        # Query address from controller
+        self.sendCmd( '++addr ' + self.addr + '\n')
 
     def burstMode(self, burstCount=1): # Burst count =1 by default
         self.qAddr()
-        self.port.write(b'MENA 1; MTYP 5\n')    #Enable modululation, set to burst
-        self.port.write( bytes('BCNT ' + str(burstCount) + '\n', 'utf-8' ))
+        self.sendCmd('MENA 1; MTYP 5\n')    #Enable modululation, set to burst
+        self.sendCmd( 'BCNT ' + str(burstCount) + '\n')
 
     def squareWave(self):
         self.qAddr()
-        self.port.write(b'FUNC 1\n')
+        self.sendCmd('FUNC 1\n')
 
     def setFreq(self, freq):    #[Hz]
         self.qAddr()
-        self.port.write( bytes('FREQ ' + str(freq) + '\n' , 'utf-8' ))
+        self.sendCmd( 'FREQ ' + str(freq) + '\n' )
 
     def setAmp(self, amp):    #[Volts]
         self.qAddr()
-        self.port.write( bytes( 'AMPL ' + str(amp) + 'VP\n', 'utf-8' ))
+        self.sendCmd( 'AMPL ' + str(amp) + 'VP\n')
 
     def setTrg(self, trg, trgRt=1000):    # 0 = single, 1 = internal, 2 = + Ext, 3 = -Ext, 4 = line
         self.qAddr()
-        self.port.write( bytes( 'TSRC ' + str(trg) + '\n' , 'utf-8'))
+        self.sendCmd( 'TSRC ' + str(trg) + '\n' )
         if trg == 0:
-            self.port.write(b'*TRG\n')    # Trigger immediately  if set to single mode
+            self.sendCmd('*TRG\n')    # Trigger immediately  if set to single mode
         elif trg == 1:
-            self.port.write( bytes('TRAT ' + str(trgRt) + '\n', 'utf-8'  )) # Set trigger rate to trgRt [Hz] if int
+            self.sendCmd( 'TRAT ' + str(trgRt) + '\n') # Set trigger rate to trgRt [Hz] if int
 

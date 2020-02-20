@@ -4,6 +4,7 @@ import time
 
 class dg535:    #SRS pulse generator
     gpibControllerSux = False    #Some prologix controllers drop every other byte. See sendCmd()
+    WAIT = 0.1                # Seconds to wait after sending command
 
     def __init__(self, devpath, address):
         self.devpath = devpath
@@ -13,16 +14,16 @@ class dg535:    #SRS pulse generator
         self.qAddr()
         self.sendCmd('CL\r')
 
-    def qAddr(self):        # Query address
+    def qAddr(self):        # Query address from controller
         self.port.write( bytes('++addr ' + self.addr + '\n', 'utf-8' ))
 
     def sendCmd(self, cmd): # Doubles every letter in cmd if Prologix gpib usb drops every other byte
         if self.gpibControllerSux:
             self.port.write( bytes(self.double(cmd), 'utf-8')) # Assumes cmd is a string that is null terminated
-            time.sleep(0.1)
+            time.sleep(self.WAIT)
         else:
             self.port.write( bytes(cmd, 'utf-8') )
-            time.sleep(0.1)
+            time.sleep(self.WAIT)
 
     def double(self, s):    #For instance, abc -> aabbcc
         return ''.join([x*2 for x in s])

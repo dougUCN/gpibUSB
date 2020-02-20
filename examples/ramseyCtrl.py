@@ -18,8 +18,8 @@ GPIB_ADDR_2 = 20    # DG535 acting as pulse generator
 
 def main():
     if len( sys.argv ) != 8:
-        print "Usage:", os.path.basename(sys.argv[0]),\
-         "<Pulse 1 t> <Pulse 2 t> <prec t> <Pulse 1 amp> <Pulse 2 amp> <RF freq> <RF amp>"
+        print ("Usage:", os.path.basename(sys.argv[0]),
+         "<Pulse 1 t> <Pulse 2 t> <prec t> <Pulse 1 amp> <Pulse 2 amp> <RF freq> <RF amp>")
         sys.exit(1)
     p1Time = float(sys.argv[1])
     p2Time = float(sys.argv[2])

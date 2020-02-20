@@ -12,7 +12,7 @@ def main():
     import sys
 
     if len( sys.argv ) != 4:
-        print "Usage: ", os.path.basename( sys.argv[0] ), "<COM port> <GPIB address> <Command>"
+        print ("Usage: ", os.path.basename( sys.argv[0] ), "<COM port> <GPIB address> <Command>")
         sys.exit(1)
 
     comport = sys.argv[1];
@@ -29,37 +29,37 @@ def main():
         ser = serial.Serial( sys.argv[1], 9600, timeout=0.5 )
 
         cmd = '++mode 1'        #Controller mode
-        print 'Sending:', cmd
-        ser.write(cmd + '\n')
+        print ('Sending:', cmd)
+        ser.write( bytes( cmd + '\n', 'utf-8') )
         s = ser.read(256);
         if len(s) > 0:
-            print s
+            print (s)
 
         cmd = '++addr ' + addr  #Query address
-        print 'Sending:', cmd
-        ser.write(cmd + '\n')
+        print ('Sending:', cmd)
+        ser.write( bytes( cmd + '\n', 'utf-8') )
         s = ser.read(256);
         if len(s) > 0:
-            print s
+            print (s)
 
         cmd = '++auto 1'        #Read after write
-        print 'Sending:', cmd
-        ser.write(cmd + '\n')
+        print ('Sending:', cmd)
+        ser.write( bytes( cmd + '\n', 'utf-8') )
         s = ser.read(256);
         if len(s) > 0:
-            print s
+            print (s)
 
         cmd = customCmd
-	print 'Sending:', cmd
-        ser.write(cmd + '\n')
+        print ('Sending:', cmd)
+        ser.write( bytes( cmd + '\n', 'utf-8') )
         s = ser.read(256);
         if len(s) > 0:
-            print s
-	
-    except serial.SerialException, e:
-        print e
+            print (s)
+    
+    except serial.SerialException as e:
+        print (e)
 
-    except KeyboardInterrupt, e:
+    except KeyboardInterrupt as e:
         ser.close()
 
 

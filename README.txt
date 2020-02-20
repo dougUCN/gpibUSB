@@ -1,14 +1,18 @@
 gpibUSB
------------------------
+================
+Minimal library for gpib communication using a PROLOGIX GPIB-USB connector
 
-Quick library for gpib communication using a PROLOGIX GPIB-USB connector
-Currently supported devices: DS345 Function Generator, DG535 SRS Pulse Generator 
+Currently Supported Devices
+----------------------------
+DS345 Function Generator
+DG535 Pulse Gate Generator
 
-devices.py -- class file. Refer here for available devices and daq commands. Should be easily expandable
+Not all possible commands have been implemented. This library should
+be easily expandable, though. 
 
 Examples
 ----------------------
-When writing your own code, just put it in the same folder as /devices/ and import .devices
+When writing your own code, just put it in the same folder as /devices/ and import devices
 
 rabiDS345.py -- performs a single pi pulse using two DS345 signal generators
 
