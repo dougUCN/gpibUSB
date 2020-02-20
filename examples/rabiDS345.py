@@ -10,7 +10,7 @@ import os.path
 import sys
 import serial
 import math
-import devices
+from .. import devices
 
 COM_PORT = '/dev/ttyUSB0'
 GPIB_ADDR_1 = 13    # DS345 giving the RF pulse
@@ -20,7 +20,7 @@ PULSE_GEN_AMP = 1   # [Volts]
 
 def main():
     if len( sys.argv ) != 3:
-        print "Usage: ", os.path.basename( sys.argv[0] ), "<Pulse time> <RF_Freq>"
+        print ("Usage: ", os.path.basename( sys.argv[0] ), "<Pulse time> <RF_Freq>")
         sys.exit(1)
     pulseTime = float(sys.argv[1])
     pulseFreq = float(sys.argv[2])
