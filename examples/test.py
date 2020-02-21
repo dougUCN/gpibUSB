@@ -6,10 +6,14 @@
 # DW 9/12/17
 #
 
+import os.path
+import serial
+import sys
+import time
+
 def main():
-    import os.path
-    import serial
-    import sys
+    # baudRate = 9600
+    baudRate = 115200
 
     if len( sys.argv ) != 4:
         print ("Usage: ", os.path.basename( sys.argv[0] ), "<COM port> <GPIB address> <Command>")
@@ -17,53 +21,34 @@ def main():
 
     comport = sys.argv[1];
     addr = sys.argv[2];
-    customCmd = sys.argv[3]
 
     ser = serial.Serial()
 
     try:
-        success = True
+        ser = serial.Serial( sys.argv[1], baudRate, timeout=0.5 )
 
-        # ser = serial.Serial( '\\\\.\\'+sys.argv[1], 9600, timeout=0.5 )
+        sendCmd('++addr ' + addr, ser)  #Setting address
 
-        ser = serial.Serial( sys.argv[1], 9600, timeout=0.5 )
+        sendCmd('++auto 1', ser)        #Read after write
+        
+        sendCmd(sys.argv[3], ser) 
 
-        cmd = '++mode 1'        #Controller mode
-        print ('Sending:', cmd)
-        ser.write( bytes( cmd + '\n', 'utf-8') )
-        s = ser.read(256);
-        if len(s) > 0:
-            print (s)
-
-        cmd = '++addr ' + addr  #Query address
-        print ('Sending:', cmd)
-        ser.write( bytes( cmd + '\n', 'utf-8') )
-        s = ser.read(256);
-        if len(s) > 0:
-            print (s)
-
-        cmd = '++auto 1'        #Read after write
-        print ('Sending:', cmd)
-        ser.write( bytes( cmd + '\n', 'utf-8') )
-        s = ser.read(256);
-        if len(s) > 0:
-            print (s)
-
-        cmd = customCmd
-        print ('Sending:', cmd)
-        ser.write( bytes( cmd + '\n', 'utf-8') )
-        s = ser.read(256);
-        if len(s) > 0:
-            print (s)
-    
     except serial.SerialException as e:
-        print (e)
+        print(e)
 
     except KeyboardInterrupt as e:
         ser.close()
 
 
     return
+
+def sendCmd(cmd, ser):
+    print('Sending:',cmd)
+    ser.write( bytes( cmd + '\n', 'utf-8') )
+    time.sleep(0.1)
+    s = ser.read(256)
+    if len(s) > 0:
+        print(s)
 
 if ( __name__ == '__main__' ):
     main()

@@ -10,7 +10,9 @@ import os.path
 import sys
 import serial
 import math
-from .. import devices
+
+sys.path.append("..")
+import devices
 
 COM_PORT = '/dev/ttyUSB0'
 GPIB_ADDR_1 = 13    # DS345 giving the RF pulse
