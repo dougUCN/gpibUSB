@@ -45,8 +45,8 @@ def main():
 def sendCmd(cmd, ser):
     print('Sending:',cmd)
     ser.write( bytes( cmd + '\n', 'utf-8') )
-    time.sleep(0.1)
     s = ser.read(256)
+    time.sleep(0.1)
     if len(s) > 0:
         print(s)
 

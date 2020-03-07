@@ -2,9 +2,9 @@ import sys
 import serial
 import time
 
-class dg535:    #SRS pulse generator
-    gpibControllerSux = False    #Some prologix controllers drop every other byte. See sendCmd()
-    WAIT = 0.1                # Seconds to wait after sending command
+class dg535:    
+    """DG 535 Pulse Gate"""
+    TIMEOUT = 0.1                # Seconds to wait after sending command
 
     def __init__(self, devpath, address):
         self.devpath = devpath
@@ -14,41 +14,45 @@ class dg535:    #SRS pulse generator
         self.qAddr()
         self.sendCmd('CL\r')
 
-    def qAddr(self):        # Query address from controller
+    def qAddr(self):        
+        """Query address from controller"""
         self.port.write( bytes('++addr ' + self.addr + '\n', 'utf-8' ))
 
-    def sendCmd(self, cmd): # Doubles every letter in cmd if Prologix gpib usb drops every other byte
-        if self.gpibControllerSux:
-            self.port.write( bytes(self.double(cmd), 'utf-8')) # Assumes cmd is a string that is null terminated
-            time.sleep(self.WAIT)
-        else:
-            self.port.write( bytes(cmd, 'utf-8') )
-            time.sleep(self.WAIT)
+    def sendCmd(self, cmd): 
+        """Sends command to devices. cmd must be terminated with \\n"""
+        self.port.write( bytes(cmd, 'utf-8') )
+        time.sleep(self.TIMEOUT)
 
-    def double(self, s):    #For instance, abc -> aabbcc
-        return ''.join([x*2 for x in s])
 
     ### IMPORTANT ###
     ## Ports on the from panel correspond to the following numbers ##
     ## T0:1, A:2, B:3, AB/-AB:4, C:5, D:6, CD/-CD:7           ##
 
     def setPulse1(self, p1Time):
+        """Set width of pulse 1 [sec]"""
         self.qAddr()
         self.sendCmd('DT 2,1,0\n')
         self.sendCmd('DT 3,2,' + str(p1Time) + '\n')
 
     def setPulse2(self, precTime, p2Time):
+        """Sets width of pulse 2, which starts some precTime after pulse 1"""
         self.qAddr()
         self.sendCmd('DT 5,3,' + str(precTime) + '\n')
         self.sendCmd('DT 6,5,' + str(p2Time) + '\n')
 
-    def setAmp(self, output, amp): #Max step size +/- 4[V], minimum +/- 0.1[V]
+    def setAmp(self, output, amp): 
+        """Max step size +/- 4[V], minimum +/- 0.1[V]"""
         self.qAddr()
         self.sendCmd('OM ' + str(output) + ',3\n')  #Voltage variable mode
         self.sendCmd('OA ' + str(output) + ',' + str(amp) + '\n')
         self.sendCmd('OO ' + str(output) + ',0\n')    #Voltage offset
 
-    def setTrg(self, trg, trgRt=10000, extTrg =1): # 0 = Int, 1 = Ext, 2 = SS, 3 = Burst
+    def setTrg(self, trg, trgRt=10000, extTrg =1):
+        """
+        trg: 0 = Int, 1 = Ext, 2 = SingleShot, 3 = Burst
+        trgRt only applies to Int and burst mode
+        extTrg is the external trigger level in [volts]
+        """
         self.qAddr()
         self.sendCmd('TM ' + str(trg) +'\n')
         if trg == 0:        #set trigger rate for Int mode
