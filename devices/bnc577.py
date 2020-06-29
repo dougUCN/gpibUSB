@@ -7,6 +7,7 @@ class bnc577:
     TIMEOUT = 0.01 # Seconds to wait after sending command
 
     def __init__(self, devpath, address):
+        """devpath = USB com port. address = GPIB device number"""
         self.devpath = devpath
         self.port = serial.Serial(self.devpath, 9600, timeout=0.5)
         self.addr = str(address)

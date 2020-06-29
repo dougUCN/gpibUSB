@@ -6,10 +6,15 @@ class dg535:
     """DG 535 Pulse Gate"""
     TIMEOUT = 0.1                # Seconds to wait after sending command
 
-    def __init__(self, devpath, address):
+    def __init__(self, devpath, address, DOUBLE_BITS = False):
+        """
+        devpath = USB com port. address = GPIB device number
+        Set DOUBLE_BITS=True to solve DG535 bit-dropping issue (see README) 
+        """
         self.devpath = devpath
         self.port = serial.Serial(self.devpath, 9600, timeout=0.5)
         self.addr = str(address)
+        self.doubleBits = DOUBLE_BITS
 
         self.qAddr()
         self.sendCmd('CL\r')
@@ -20,9 +25,15 @@ class dg535:
 
     def sendCmd(self, cmd): 
         """Sends command to devices. cmd must be terminated with \\n"""
-        self.port.write( bytes(cmd, 'utf-8') )
+        if self.doubleBits:
+            self.port.write( bytes( self.double(cmd), 'utf-8') )
+        else:
+            self.port.write( bytes(cmd, 'utf-8') )
         time.sleep(self.TIMEOUT)
 
+    def double(self, s):
+        """For instance, abc -> aabbcc"""
+        return ''.join([x*2 for x in s])
 
     ### IMPORTANT ###
     ## Ports on the from panel correspond to the following numbers ##
